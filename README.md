@@ -18,7 +18,7 @@ window = PGui(cfg)
 window.set_url(url)
 
 if __name__ == '__main__':
-	start_ui(app, window, None)
+    start_ui(app, window, None)
 ```
 # Get Start with Flask
 ```python
@@ -36,5 +36,5 @@ def home():
     return "Welcom To PGui Framework"
     
 if __name__ == '__main__':
-	start_ui(app, window, flapp)
+    start_ui(app, window, flapp)
 ```

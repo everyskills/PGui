@@ -33,7 +33,7 @@ window = PGui(cfg)
 
 @flapp.route("/")
 def home():
-    return "Welcom To PGui Framework"
+    return "Welcome To PGui Framework"
     
 if __name__ == '__main__':
     start_ui(app, window, flapp)

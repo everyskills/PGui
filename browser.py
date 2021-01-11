@@ -2,16 +2,15 @@
 
 from datetime import datetime
 from os import path as os_path
+from threading import Thread
 
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtWebEngineWidgets as qtwe
 
-from . import messages as msg
 from .pguiwebview import PguiWebView
 from .inactivity_filter import InactivityFilter
-from . import resources
 
 from PyQt5.QtNetwork import QSslConfiguration, QSsl
 
@@ -21,7 +20,6 @@ def set_ssl_protocol():
     QSslConfiguration.setDefaultConfiguration(default_config_ssl)
 
 class PGui(qtw.QMainWindow):
-
     """
     This is the main application window class
     it defines the GUI window for the browser
@@ -38,34 +36,41 @@ class PGui(qtw.QMainWindow):
         # if it gets opened
         self.popup = None
 
-        self.setObjectName("global")
         self.setMouseTracking(True)
+
+        self.setWindowTitle('Loading...')
+
+        self.pro_bar = qtw.QProgressBar()
 
         try:
             if self.config.whitelist:
-                # we can just specify whitelist = True,
-                # which should whitelist just the start_url and bookmark urls.
                 whitelist = self.config.whitelist
                 if not isinstance(whitelist, list):
                     whitelist = []
 
-                # if self.config.start_url.startswith(("http", "https", "www", "ftp")):
                 start_host = qtc.QUrl(self.config.start_url).host()
                 whitelist.append(start_host)
-                self.config.whitelist = set(whitelist)  # uniquify and optimize
+                self.config.whitelist = set(whitelist) 
+
+            if self.config.progress_bar:
+                self.pro_bar.show()
+                self.on_load_progress(self.prog)
 
         except AttributeError:
             pass
 
-        # if self.config.proxy_server:
-        #     os.environ["http_proxy"] = self.config.proxy_server
-        #     os.environ["https_proxy"] = self.config.proxy_server
-
-        # self.browser_window._page.runJavaScript("document.getElementByTagName('h1').innerHTML = '<h5>hello from py js</h5>'")
-        # print(self.browser_window._page.findText("Welcom")) # select text
-
         self.__initUI__()
-        self.on_load_progress(lambda x: print("Load Progress Bar (%s) " %x))
+
+    def adjustTitle(self):
+        self.setWindowTitle(self.title())
+
+    def prog(self, value):
+        Thread(target=self.set_pro, kwargs={"value": value}, daemon=True).start()
+
+    def set_pro(self, value=0):
+        self.pro_bar.setValue(value)
+        if value >= 100:
+            self.pro_bar.close()
 
     def __initUI__(self):
         self.create_webprofile()
@@ -133,7 +138,6 @@ class PGui(qtw.QMainWindow):
         path.addRoundedRect(qtc.QRectF(self.rect()), radius, radius)
         mask = qtg.QRegion(path.toFillPolygon().toPolygon())
         self.setMask(mask)
-        # self.setStyleSheet("QMainWindow {background: #002025; border: 1px solid #093038;}")
 
     def web_back(self, count: int=1):
         for _ in range(1, count):
@@ -246,7 +250,11 @@ class PGui(qtw.QMainWindow):
             _type = "https://"
         else: _type = ""
 
-        self.browser_window.setUrl(qtc.QUrl(_type+url))
+        if _type == "text":
+            self.browser_window.setHtml(url)
+        else:
+            self.browser_window.setUrl(qtc.QUrl(_type+url))
+            
         self.config.start_url = _type+url
     
     def set_html(self, html: str, url: str):
@@ -504,7 +512,8 @@ def default_config():
 	return config
 
 ## Start UI
-def start_ui(app: object, window: object, fserver: object, duration=0, on_load_finshed: bool=False, **fkwargs):
+def start_ui(app: object, window: object, fserver: object, 
+            duration=0, on_load_finished: bool=False, **fkwargs):
     
     from threading import Thread
     from time import sleep
@@ -519,11 +528,10 @@ def start_ui(app: object, window: object, fserver: object, duration=0, on_load_f
     fkwargs["use_reloader"] = False
 
     if fserver is not None:
-        thread = Thread(target=fserver.run, daemon=True, kwargs=fkwargs).start()
-        # window.browser_window.reload()
+        Thread(target=fserver.run, daemon=True, kwargs=fkwargs).start()
         print("\n ##--------------- Start Flask Server ---------------##\n")
 
-    if on_load_finshed: 
+    if on_load_finished:
         sleep(duration)
         window.browser_window.loadFinished.connect(window.show)
     else: 
@@ -531,34 +539,3 @@ def start_ui(app: object, window: object, fserver: object, duration=0, on_load_f
         window.show()
 
     exit(app.exec_())
-
-
-## Install
-# pip3 install PyQt5
-# pip3 install PyQtWebEngine
-
-# ## Start UI
-# def start_ui(window: object, fserver: object, fargs=["localhost", 5000],
-#              fconfig: str="", duration=0, on_load_finshed: bool=False):
-    
-#     from threading import Thread
-#     import time
-
-#     def show():
-#         time.sleep(duration) 
-#         window.show()
-
-#     if fserver is not None:
-#         if fconfig:
-#             fserver.config.from_pyfile(fconfig)
-        
-#         thread = Thread(target=fserver.run, args=fargs)
-#         thread.daemon = True
-#         thread.start()
-#         window.browser_window.reload()
-
-#     if on_load_finshed: 
-#         window.browser_window.loadFinished.connect(show)
-#     else: 
-#         show()
-

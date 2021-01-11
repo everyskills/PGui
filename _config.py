@@ -9,17 +9,16 @@ def fr(file: str):
 
 ## Config Window
 class Config():
-
 	def __init__(self):
-		## User Config
+		## Main/User Config
 		self.title           = "PGui Framework"
-		self.bg_color        = "#fff" # #358eef
+		self.bg_color        = "#fff" # "#358eef"
 		self.icon            = get_base_dir("icon.png")
-		self.start_url 		 = fr(get_base_dir("index.html")) # url for show in ui
+		self.start_url 		 = fr(get_base_dir("index.html")) # url for show
 		self.timeout 		 = 1000
 		self.zoom_factor 	 = 0
-		self.icon_theme 	 = "breeze" # # gtk, breeze, oxygen, windows, etc...
-		self.style_type      = "breeze"  # gtk, breeze, oxygen, windows, etc...
+		self.icon_theme 	 = "breeze" # gtk, breeze, oxygen, windows, etc...
+		self.style_type      = "breeze" # gtk, breeze, oxygen, windows, etc...
 		self.width           = 1000
 		self.height          = 600
 		self.maximum_size    = () # w, h
@@ -35,7 +34,7 @@ class Config():
 		self.show_scroll_bar = True
 		self.stylesheet      = "" # open(get_base_dir("web/css/style.css")).read() # use this for style main window
 		
-		## Advanced Config
+		## More Config
 		self.privacy_mode 	  = True
 		self.user_agent       = "" # WebKit
 		self.allow_popups 	  = True
@@ -43,12 +42,39 @@ class Config():
 		self.allow_printing   = True
 		self.force_js_confirm = "accept" # (ask, deny)
 		self.suppress_alerts  = False
-		self.ssl_mode 		  = "strict" # strict, ignore
+		self.ssl_mode 		  = "strict" # (strict, ignore)
+		self.progress_bar     = False
 
 		## web settings
-		self.allow_external_content = True # download configur
+		self.allow_external_content = False # download configur
 		self.page_unavailable_html  = "" # self.fr("examples/custom404.html")
 		self.network_down_html      = "" # self.fr("examples/custom_network_down.html")
+		
+		## More Advanced Settings
+		self.accelerated_2d_canvas  = False
+		self.local_storage          = True
+		self.local_content_can_access_remote_urls = True
+		self.auto_load_images = True
+		self.touch_icons = True
+		self.auto_load_icons_for_page = True
+		self.allow_running_insecure_content = True
+		self.allow_all_unknown_url_schemes = False
+		self.allow_geolocation_on_insecure_origins = False
+		self.local_content_can_access_file_urls = False
+		self.javascript_can_access_clipboard = True
+		self.scroll_animator = False
+		self.allow_unknown_url_schemes_from_user_interaction = False
+		self.allow_window_activation_from_js = True
+		self.print_element_backgrounds = False
+		self.screen_capture = False
+		self.javascript_can_paste = True
+		self.full_screen_support = False
+		self.links_included_in_focus_chain = False
+		self.dns_prefetch = False
+		self.XSS_auditing = False
+		self.pdf_viewer = False
+		self.spatial_navigation = False
+		self.hyperlink_auditing = False
 
 		## Printers Settings
 		self.print_settings = {
